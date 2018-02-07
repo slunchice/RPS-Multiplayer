@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>RPS - Mutiplayer</title>
+    <style type="text/css">
+        button {
+            float: right;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <div class="row">
+                <button type="button" class="btn btn-primary">Login</button>
+            </div>
+            <div class="row">
+                <div class="col-sm-4"> Player 1</div>
+                <div class="col-sm-4"> Player 2</div>
+                <div class="col-sm-4"> Chat</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyCxKD4fYnwKed90Qla_9M1AmCxcoO1pzjY",
+            authDomain: "rps-multiplayer-768cd.firebaseapp.com",
+            databaseURL: "https://rps-multiplayer-768cd.firebaseio.com",
+            projectId: "rps-multiplayer-768cd",
+            storageBucket: "rps-multiplayer-768cd.appspot.com",
+            messagingSenderId: "762655230553"
+        };
+        firebase.initializeApp(config);
+
+        // Create a variable to reference the database.
+        var database = firebase.database();
+
+        // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
+        // connectionsRef references a specific location in our database.
+        // All of our connections will be stored in this directory.
+        var connectionsRef = database.ref("/connections");
+
+        // '.info/connected' is a special location provided by Firebase that is updated every time
+        // the client's connection state changes.
+        // '.info/connected' is a boolean value, true if the client is connected and false if they are not.
+        var connectedRef = database.ref(".info/connected");
+
+        // When the client's connection state changes...
+        connectedRef.on("value", function (snap) {
+
+            // If they are connected..
+            if (snap.val()) {
+
+                // Add user to the connections list.
+                var con = connectionsRef.push(true);
+                var key = con.key
+                console.log(key);
+
+                // Remove user from the connection list when they disconnect.
+                con.onDisconnect().remove();
+            }
+        });
+
+        // When first loaded or when the connections list changes...
+        connectionsRef.on("value", function (snap) {
+
+            // Display the viewer count in the html.
+            // The number of online users is the number of children in the connections list.
+           
+            if (snap.numChildren() === 1){
+                alert("waiting for another player");
+            } else if(snap.numChildren() === 2){
+                var choice = prompt("Pick r or p or s");
+            }
+        });
+
+        //add my choice to db
+        //when a choice is added, see if there are 2 choices
+        //if there are 2 choices in the db, compare the choices, declare a winner and let them choose again
+    </script>
+
+
+
+
+</body>
+
+</html>
